@@ -11,7 +11,11 @@ export class UsersService {
 
   async create(email: string, password: string, role: Role): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new this.userModel({ email, password: hashedPassword, role });
+    const user = new this.userModel({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role,
+    });
     try {
       return await user.save();
     } catch (error) {
@@ -23,7 +27,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ email }).exec();
+    return this.userModel.findOne({ email: email.toLowerCase() }).exec();
   }
 
   async findById(id: string): Promise<User | null> {
