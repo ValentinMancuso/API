@@ -16,7 +16,7 @@ API REST con NestJS y TypeScript. Autenticación con JWT y manejo de roles (ADMI
 ## Instalación
 
 ```bash
-git clone https://github.com/tu-usuario/api.git
+git clone https://github.com/ValentinMancuso/API.git
 cd api
 npm install
 ```
@@ -24,8 +24,8 @@ npm install
 Copiá `.env.example` a `.env` y completá con tus datos:
 
 ```env
-MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/dbname
-JWT_SECRET=tu_secreto_jwt
+MONGODB_URI=mongodb+srv://user:password@cluster.xxxxx.mongodb.net/dbname?retryWrites=true&w=majority
+JWT_SECRET=your_secret_key
 JWT_EXPIRATION=1d
 ```
 

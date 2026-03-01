@@ -35,6 +35,9 @@ export class UsersService {
   }
 
   async update(id: string, attrs: UpdateUserDto): Promise<User | null> {
+    if (attrs.email) {
+      attrs.email = attrs.email.toLowerCase();
+    }
     if (attrs.password) {
       attrs.password = await bcrypt.hash(attrs.password, 10);
     }
