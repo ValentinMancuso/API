@@ -22,7 +22,7 @@ npm install
 Copiá `.env.example` a `.env` y completá con tus datos:
 
 ```env
-MONGODB_URI=mongodb+srv://user:password@cluster.xxxxx.mongodb.net/dbname?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://user:password@cluster.xxxxx.mongodb.net/?appName=cluster
 JWT_SECRET=your_secret_key
 JWT_EXPIRATION=1d
 ```
