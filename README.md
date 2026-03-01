@@ -1,7 +1,5 @@
 # API
 
-Challenge técnico desarrollado para el proceso de selección de **Backend Jr en Conexa**.
-
 API REST con NestJS y TypeScript. Autenticación con JWT y manejo de roles (ADMIN / GUEST).
 
 **Autor:** Valentín Mancuso Micka — [LinkedIn](https://www.linkedin.com/in/valentinmancusomicka/)
@@ -17,7 +15,7 @@ API REST con NestJS y TypeScript. Autenticación con JWT y manejo de roles (ADMI
 
 ```bash
 git clone https://github.com/ValentinMancuso/API.git
-cd api
+cd API
 npm install
 ```
 
@@ -53,87 +51,133 @@ La API está deployada en Render: https://api-483o.onrender.com
 
 ### Auth
 
-**POST /auth/register**
+#### `POST` https://api-483o.onrender.com/auth/register
 
-Registra un usuario con rol GUEST.
+Registra un usuario con rol GUEST. No requiere autenticación.
 
 ```json
-// Body
-{ "email": "usuario@email.com", "password": "123456" }
-
-// Response 201
-{ "id": "...", "email": "usuario@email.com", "role": "GUEST" }
+{
+  "email": "usuario@email.com",
+  "password": "123456"
+}
 ```
 
-**POST /auth/login**
-
-Devuelve un token JWT.
+Response `201`:
 
 ```json
-// Body
-{ "email": "usuario@email.com", "password": "123456" }
+{
+  "id": "...",
+  "email": "usuario@email.com",
+  "role": "GUEST"
+}
+```
 
-// Response 201
-{ "access_token": "eyJhbGci..." }
+#### `POST` https://api-483o.onrender.com/auth/login
+
+Autentica un usuario y devuelve un token JWT. No requiere autenticación.
+
+```json
+{
+  "email": "usuario@email.com",
+  "password": "123456"
+}
+```
+
+Response `201`:
+
+```json
+{
+  "access_token": "eyJhbGci..."
+}
 ```
 
 ---
 
 ### Users
 
-**POST /users/seed**
+#### `POST` https://api-483o.onrender.com/users/seed
 
-Crea el primer usuario ADMIN. Solo funciona una vez; si ya existe un admin devuelve error.
-
-```json
-// Body
-{ "email": "admin@email.com", "password": "admin123" }
-
-// Response 201
-{ "id": "...", "email": "admin@email.com", "role": "ADMIN" }
-```
-
-**POST /users** — `Requiere JWT (ADMIN)`
-
-Crea un usuario con el rol que se indique.
+Crea el primer usuario ADMIN. Solo funciona una vez; si ya existe un admin devuelve `409`.
 
 ```json
-// Headers
-Authorization: Bearer <token>
-
-// Body
-{ "email": "nuevo@email.com", "password": "123456", "role": "GUEST" }
-
-// Response 201
-{ "id": "...", "email": "nuevo@email.com", "role": "GUEST" }
+{
+  "email": "admin@email.com",
+  "password": "admin123"
+}
 ```
 
-**PATCH /users/:id** — `Requiere JWT (ADMIN)`
-
-Actualiza uno o más campos de un usuario.
+Response `201`:
 
 ```json
-// Headers
-Authorization: Bearer <token>
-
-// Body (todos los campos son opcionales)
-{ "email": "editado@email.com" }
-
-// Response 200
-{ "id": "...", "email": "editado@email.com", "role": "GUEST" }
+{
+  "id": "...",
+  "email": "admin@email.com",
+  "role": "ADMIN"
+}
 ```
 
-**GET /users** — `Requiere JWT`
+#### `POST` https://api-483o.onrender.com/users
 
-Lista usuarios. Soporta paginación y búsqueda por email (case insensitive).
+Crea un usuario. Requiere JWT con rol ADMIN.
 
-```
-GET /users?page=1&limit=20
-GET /users?page=1&limit=20&email=admin
-```
+Header: `Authorization: Bearer <token>`
 
 ```json
-// Response 200
+{
+  "email": "nuevo@email.com",
+  "password": "123456",
+  "role": "GUEST"
+}
+```
+
+Response `201`:
+
+```json
+{
+  "id": "...",
+  "email": "nuevo@email.com",
+  "role": "GUEST"
+}
+```
+
+#### `PATCH` https://api-483o.onrender.com/users/:id
+
+Actualiza uno o más campos de un usuario. Requiere JWT con rol ADMIN.
+
+Header: `Authorization: Bearer <token>`
+
+```json
+{
+  "email": "editado@email.com"
+}
+```
+
+Response `200`:
+
+```json
+{
+  "id": "...",
+  "email": "editado@email.com",
+  "role": "GUEST"
+}
+```
+
+#### `GET` https://api-483o.onrender.com/users
+
+Lista usuarios con paginación y búsqueda por email (case insensitive). Requiere JWT (cualquier rol).
+
+Header: `Authorization: Bearer <token>`
+
+Ejemplos:
+
+```
+https://api-483o.onrender.com/users?page=1&limit=20
+https://api-483o.onrender.com/users?page=1&limit=20&email=admin
+```
+
+Response `200`:
+
+```json
 {
   "data": [
     {

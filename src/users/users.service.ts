@@ -34,14 +34,14 @@ export class UsersService {
     return this.userModel.findById(id).exec();
   }
 
-  async update(id: string, attrs: UpdateUserDto): Promise<User | null> {
-    if (attrs.email) {
-      attrs.email = attrs.email.toLowerCase();
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
+    if (updateUserDto.email) {
+      updateUserDto.email = updateUserDto.email.toLowerCase();
     }
-    if (attrs.password) {
-      attrs.password = await bcrypt.hash(attrs.password, 10);
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
-    return this.userModel.findByIdAndUpdate(id, attrs, { new: true }).exec();
+    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
   }
 
   async findAll(page: number, limit: number, email?: string) {
