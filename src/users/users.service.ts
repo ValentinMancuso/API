@@ -1,4 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -41,7 +45,19 @@ export class UsersService {
     if (updateUserDto.password) {
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+    try {
+      return await this.userModel
+        .findByIdAndUpdate(id, updateUserDto, { new: true })
+        .exec();
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new ConflictException('Email already in use');
+      }
+      if (error.name === 'CastError') {
+        throw new NotFoundException('User not found');
+      }
+      throw error;
+    }
   }
 
   async findAll(page: number, limit: number, email?: string) {
