@@ -12,7 +12,7 @@ describe('AuthController', () => {
       role: 'GUEST',
     }),
     login: jest.fn().mockResolvedValue({
-      access_token: 'fake-token',
+      access_token: 'token',
     }),
   };
 
@@ -49,7 +49,7 @@ describe('AuthController', () => {
         email: 'test@test.com',
         password: '123456',
       });
-      expect(result.access_token).toBe('fake-token');
+      expect(result.access_token).toBe('token');
     });
   });
 });

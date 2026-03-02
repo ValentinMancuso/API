@@ -9,12 +9,11 @@ describe('UsersService', () => {
 
   const mockUser = {
     _id: '123',
-    email: 'test@test.com',
-    password: 'hashedpassword',
+    email: 'juan.perez@test.com',
+    password: 'password',
     role: Role.GUEST,
   };
 
-  // Tiene que ser jest.fn() (no un objeto) para poder usarlo como constructor (new Model())
   const mockUserModel: any = jest.fn();
   mockUserModel.findOne = jest.fn();
   mockUserModel.findById = jest.fn();
@@ -49,7 +48,7 @@ describe('UsersService', () => {
       const saveMock = jest.fn().mockResolvedValue(mockUser);
       mockUserModel.mockImplementation(() => ({ save: saveMock }));
 
-      await service.create('test@test.com', 'plainpassword', Role.GUEST);
+      await service.create('juan.perez@test.com', 'plainpassword', Role.GUEST);
       expect(saveMock).toHaveBeenCalled();
     });
 
@@ -57,7 +56,7 @@ describe('UsersService', () => {
       const saveMock = jest.fn().mockResolvedValue(mockUser);
       mockUserModel.mockImplementation(() => ({ save: saveMock }));
 
-      await service.create('test@test.com', 'plainpassword', Role.GUEST);
+      await service.create('juan.perez@test.com', 'plainpassword', Role.GUEST);
 
       const savedData = mockUserModel.mock.calls[0][0];
       expect(savedData.password).not.toBe('plainpassword');
@@ -104,10 +103,10 @@ describe('UsersService', () => {
         exec: jest.fn().mockResolvedValue(mockUser),
       });
 
-      const result = await service.findByEmail('test@test.com');
+      const result = await service.findByEmail('juan.perez@test.com');
       expect(result).toEqual(mockUser);
       expect(mockUserModel.findOne).toHaveBeenCalledWith({
-        email: 'test@test.com',
+        email: 'juan.perez@test.com',
       });
     });
 
@@ -163,7 +162,13 @@ describe('UsersService', () => {
       });
 
       const result = await service.findAll(1, 20);
-      expect(result.data).toEqual(users);
+      expect(result.data).toEqual([
+        {
+          id: mockUser._id,
+          email: mockUser.email,
+          role: mockUser.role,
+        },
+      ]);
       expect(result.total).toBe(1);
       expect(result.page).toBe(1);
       expect(result.limit).toBe(20);

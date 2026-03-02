@@ -45,6 +45,8 @@ La API está deployada en Render: https://api-483o.onrender.com
 
 > El tier gratuito de Render duerme el servicio tras un período de inactividad, por lo que la primera request puede tardar unos segundos.
 
+Documentación interactiva (Swagger): https://api-483o.onrender.com/api
+
 ---
 
 ## Endpoints
@@ -83,7 +85,7 @@ Autentica un usuario y devuelve un token JWT. No requiere autenticación.
 }
 ```
 
-Response `201`:
+Response `200`:
 
 ```json
 {
@@ -181,11 +183,9 @@ Response `200`:
 {
   "data": [
     {
-      "_id": "...",
+      "id": "...",
       "email": "admin@email.com",
-      "role": "ADMIN",
-      "createdAt": "...",
-      "updatedAt": "..."
+      "role": "ADMIN"
     }
   ],
   "total": 1,

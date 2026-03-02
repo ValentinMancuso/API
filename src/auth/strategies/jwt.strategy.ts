@@ -12,6 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: { sub: string; email: string; role: string }) {
+    // Los datos del usuario quedan disponibles en el objeto Request
     return { userId: payload.sub, email: payload.email, role: payload.role };
   }
 }

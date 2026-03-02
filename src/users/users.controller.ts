@@ -10,6 +10,7 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,15 +21,17 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('seed')
+  @ApiOperation({ summary: 'Create the first ADMIN user (One time only)' })
   async seed(@Body() body: RegisterDto) {
     const adminCount = await this.usersService.countAdmins();
     if (adminCount > 0) {
-      throw new ConflictException('Seed already executed');
+      throw new ConflictException('The admin user already exists');
     }
     const user = await this.usersService.create(
       body.email,
@@ -39,6 +42,8 @@ export class UsersController {
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a user (ADMIN only)' })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   async create(@Body() createUserDto: CreateUserDto) {
@@ -51,6 +56,8 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update a user by ID (ADMIN only)' })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -62,6 +69,8 @@ export class UsersController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'List users with pagination and search' })
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   async findAll(@Query() query: QueryUserDto) {
     const page = Number(query.page) || 1;

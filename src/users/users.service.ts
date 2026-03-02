@@ -66,7 +66,7 @@ export class UsersService {
       filter.email = { $regex: email, $options: 'i' };
     }
 
-    const data = await this.userModel
+    const users = await this.userModel
       .find(filter)
       .select('-password')
       .skip((page - 1) * limit)
@@ -74,6 +74,11 @@ export class UsersService {
       .exec();
 
     const total = await this.userModel.countDocuments(filter).exec();
+    const data = users.map((user) => ({
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    }));
 
     return { data, total, page, limit };
   }

@@ -22,7 +22,7 @@ describe('AuthService', () => {
     };
 
     jwtService = {
-      sign: jest.fn().mockReturnValue('fake-token'),
+      sign: jest.fn().mockReturnValue('token'),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -55,16 +55,16 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('should return a token with valid credentials', async () => {
-      const hashedPassword = await bcrypt.hash('123456', 10);
+      const password = await bcrypt.hash('123456', 10);
       (usersService.findByEmail as jest.Mock).mockResolvedValue({
         _id: '123',
         email: 'test@test.com',
-        password: hashedPassword,
+        password: password,
         role: Role.GUEST,
       });
 
       const result = await service.login('test@test.com', '123456');
-      expect(result.access_token).toBe('fake-token');
+      expect(result.access_token).toBe('token');
     });
 
     it('should throw if user not found', async () => {
@@ -76,11 +76,11 @@ describe('AuthService', () => {
     });
 
     it('should throw if password is wrong', async () => {
-      const hashedPassword = await bcrypt.hash('123456', 10);
+      const password = await bcrypt.hash('123456', 10);
       (usersService.findByEmail as jest.Mock).mockResolvedValue({
         _id: '123',
         email: 'test@test.com',
-        password: hashedPassword,
+        password: password,
         role: Role.GUEST,
       });
 
