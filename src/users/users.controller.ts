@@ -9,7 +9,17 @@ import {
   UseGuards,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiConflictResponse,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -27,6 +37,8 @@ export class UsersController {
 
   @Post('seed')
   @ApiOperation({ summary: 'Create the first ADMIN user (One time only)' })
+  @ApiCreatedResponse({ description: 'Admin user created' })
+  @ApiConflictResponse({ description: 'Admin user already exists' })
   async seed(@Body() body: RegisterDto) {
     const user = await this.usersService.seed(body.email, body.password);
     return { id: user._id, email: user.email, role: user.role };
@@ -37,6 +49,10 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiCreatedResponse({ description: 'User created' })
+  @ApiUnauthorizedResponse({ description: 'Invalid or missing token' })
+  @ApiForbiddenResponse({ description: 'ADMIN role required' })
+  @ApiConflictResponse({ description: 'Email already in use' })
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(
       createUserDto.email,
@@ -51,6 +67,11 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiOkResponse({ description: 'User updated' })
+  @ApiUnauthorizedResponse({ description: 'Invalid or missing token' })
+  @ApiForbiddenResponse({ description: 'ADMIN role required' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiConflictResponse({ description: 'Email already in use' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const user = await this.usersService.update(id, updateUserDto);
     if (!user) {
@@ -63,6 +84,8 @@ export class UsersController {
   @ApiOperation({ summary: 'List users with pagination and search' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ description: 'Paginated list of users' })
+  @ApiUnauthorizedResponse({ description: 'Invalid or missing token' })
   async findAll(@Query() query: QueryUserDto) {
     return this.usersService.findAll(query.page, query.limit, query.email);
   }
