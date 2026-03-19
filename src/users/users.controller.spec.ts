@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { Role } from './schemas/user.schema';
@@ -24,7 +23,7 @@ describe('UsersController', () => {
       page: 1,
       limit: 20,
     }),
-    countAdmins: jest.fn().mockResolvedValue(0),
+    seed: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -46,8 +45,7 @@ describe('UsersController', () => {
 
   describe('seed', () => {
     it('should create admin if no admins exist', async () => {
-      mockUsersService.countAdmins.mockResolvedValue(0);
-      mockUsersService.create.mockResolvedValue({
+      mockUsersService.seed.mockResolvedValue({
         _id: '123',
         email: 'admin@test.com',
         role: Role.ADMIN,
@@ -58,20 +56,16 @@ describe('UsersController', () => {
         password: 'admin123',
       });
       expect(result.role).toBe(Role.ADMIN);
-    });
-
-    it('should throw if an admin already exists', async () => {
-      mockUsersService.countAdmins.mockResolvedValue(1);
-
-      await expect(
-        controller.seed({ email: 'admin@test.com', password: 'admin123' }),
-      ).rejects.toThrow(ConflictException);
+      expect(mockUsersService.seed).toHaveBeenCalledWith(
+        'admin@test.com',
+        'admin123',
+      );
     });
   });
 
   describe('findAll', () => {
     it('should return paginated users', async () => {
-      const result = await controller.findAll({ page: '1', limit: '20' });
+      const result = await controller.findAll({ page: 1, limit: 20 });
       expect(result.page).toBe(1);
       expect(result.limit).toBe(20);
     });

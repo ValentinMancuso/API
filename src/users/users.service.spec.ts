@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
+import { ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from './users.service';
 import { User, Role } from './schemas/user.schema';
@@ -131,17 +132,33 @@ describe('UsersService', () => {
     });
   });
 
-  describe('countAdmins', () => {
-    it('should return the number of admins', async () => {
+  describe('seed', () => {
+    it('should create admin if no admins exist', async () => {
       mockUserModel.countDocuments.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(2),
+        exec: jest.fn().mockResolvedValue(0),
       });
+      const saveMock = jest.fn().mockResolvedValue({
+        _id: '123',
+        email: 'admin@test.com',
+        role: Role.ADMIN,
+      });
+      mockUserModel.mockImplementation(() => ({ save: saveMock }));
 
-      const result = await service.countAdmins();
-      expect(result).toBe(2);
+      const result = await service.seed('admin@test.com', 'admin123');
+      expect(result.role).toBe(Role.ADMIN);
       expect(mockUserModel.countDocuments).toHaveBeenCalledWith({
         role: Role.ADMIN,
       });
+    });
+
+    it('should throw if an admin already exists', async () => {
+      mockUserModel.countDocuments.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(1),
+      });
+
+      await expect(service.seed('admin@test.com', 'admin123')).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 

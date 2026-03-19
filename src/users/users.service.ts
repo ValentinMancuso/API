@@ -83,7 +83,13 @@ export class UsersService {
     return { data, total, page, limit };
   }
 
-  async countAdmins(): Promise<number> {
-    return this.userModel.countDocuments({ role: Role.ADMIN }).exec();
+  async seed(email: string, password: string): Promise<User> {
+    const adminCount = await this.userModel
+      .countDocuments({ role: Role.ADMIN })
+      .exec();
+    if (adminCount > 0) {
+      throw new ConflictException('The admin user already exists');
+    }
+    return this.create(email, password, Role.ADMIN);
   }
 }
